@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng Sinh Nhật - Special Gift</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Dancing+Script:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- GỘP CSS TỪ 3 FILE --- */
+        :root {
+            --primary: #ff6b6b;
+            --secondary: #ffcccc;
+            --bg-color: #f0f2f5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden; /* Ngăn cuộn trang */
+            background: #1a1a1a;
+            color: #333;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Ẩn hiện các màn hình */
+        .screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+            display: flex;
+            visibility: hidden;
+        }
+        
+        .screen.active {
+            opacity: 1;
+            pointer-events: all;
+            z-index: 10;
+            visibility: visible;
+        }
+
+        /* --- SCREEN 1: LOGIN (index.html) --- */
+        #screen-login {
+            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .login-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 320px;
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ff6b6b;
+            margin-bottom: 15px;
+        }
+
+        .password-section h1 { font-size: 18px; margin-bottom: 15px; color: #333; }
+        
+        #password-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            letter-spacing: 5px;
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .keypad button {
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .keypad button:active { background: #dcdcdc; }
+        .keypad button.submit { background: #4CAF50; color: white; }
+        .keypad button.clear { background: #ff6b6b; color: white; }
+
+        /* --- SCREEN 2: LÁ THƯ (sinhnhat.html) --- */
+        #screen-letter {
+            background: #ffdede;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .envelope {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background: #ff4757;
+            cursor: pointer;
+            transition: transform 0.5s;
+        }
+
+        .envelope:hover { transform: scale(1.05); }
+
+        .envelope.open .envelope-flap { 
+            transform: rotateX(180deg); 
+            z-index: 0;
+        }
+        
+        .envelope.open .letter { 
+            transform: translateY(-150px); 
+            z-index: 2; 
+            height: 380px;
+            opacity: 1;
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 110px solid #ff6b81;
+            transform-origin: top;
+            transition: 0.6s;
+            z-index: 3;
+        }
+
+        .letter {
+            position: absolute;
+            top: 30px;
+            left: 10px;
+            width: 280px;
+            height: 160px;
+            background: white;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.6s ease;
+            z-index: 1;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.1rem;
+            opacity: 0;
+            transform: translateY(0);
+        }
+
+        .letter h1 { 
+            font-size: 1.5rem; 
+            color: #ff4757; 
+            margin-bottom: 10px;
+        }
+
+        .signature {
+            text-align: right;
+            font-style: italic;
+            margin-top: 20px;
+        }
+
+        #nextButton {
+            padding: 10px 20px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            opacity: 0;
+            transition: opacity 1s;
+            position: relative;
+            z-index: 20;
+            pointer-events: auto;
+        }
+
+        #nextButton:hover {
+            background: #555;
+        }
+
+        /* --- SCREEN 3: BÁNH & BANNER (banh.html) --- */
+        #screen-party {
+            background-color: #000;
+            background-image: 
+                radial-gradient(circle at 50% 50%, #2b2b2b 0%, #000 100%);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+            position: relative;
+        }
+
+        #fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .banner-content {
+            position: relative;
+            z-index: 20;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        #hbdText {
+            font-family: 'Caveat', cursive;
+            font-size: 4rem;
+            color: #ffcc00;
+            text-shadow: 0 0 10px #ffcc00;
+            margin-bottom: 20px;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        #giftBtn {
+            padding: 15px 30px;
+            font-size: 20px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px #ff4757;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* 3 Images Layout */
+        .slider {
+            display: none;
+            flex-direction: row;
+            gap: 30px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            perspective: 1000px;
+        }
+
+        .slider .item {
+            width: 200px;
+            height: 250px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            animation: float-gentle 3s ease-in-out infinite;
+        }
+
+        .slider .item:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .slider .item:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .slider .item:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        .slider .item:hover {
+            transform: scale(1.1) translateY(-10px);
+            z-index: 10;
+        }
+
+        .slider .item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes float-gentle {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .cake-img {
+            width: 150px;
+            margin-top: 20px;
+            display: none;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .hidden-el { display: none !important; }
+        .show-el { display: flex !important; animation: fadeIn 2s; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Hearts animation for letter screen */
+        .hearts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            opacity: 0;
+            animation: float-up 3s ease-in forwards;
+            pointer-events: none;
+        }
+
+        @keyframes float-up {
+            0% {
+                opacity: 1;
+                transform: translateY(0) translateX(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100vh) translateX(100px) scale(0);
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="screen-login" class="screen active">
+        <div class="login-container">
+            <img src="https://p16-sign-sg.tiktokcdn.com/tos-alisg-avt-0068/2b275d7be339c8cc112ff28497b1ac3a~tplv-tiktokx-cropcenter:1080:1080.jpeg?dr=14579&refresh_token=ace16a4c&x-expires=1770213600&x-signature=VA1omENy4NwzQ3z0lBEeelUooec%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=81f88b70&idc=my2" alt="Avatar" class="avatar" onerror="this.src='https://via.placeholder.com/100'">
+            <div class="password-section">
+                <h1>NHẬP PASS ĐI NGƯỜI ĐẸP</h1>
+                <input type="password" id="password-input" placeholder="******" readonly />
+                <div class="keypad">
+                    <button onclick="addNumber('1')">1</button>
+                    <button onclick="addNumber('2')">2</button>
+                    <button onclick="addNumber('3')">3</button>
+                    <button onclick="addNumber('4')">4</button>
+                    <button onclick="addNumber('5')">5</button>
+                    <button onclick="addNumber('6')">6</button>
+                    <button onclick="addNumber('7')">7</button>
+                    <button onclick="addNumber('8')">8</button>
+                    <button onclick="addNumber('9')">9</button>
+                    <button onclick="addNumber('0')">0</button>
+                    <button onclick="clearPassword()" class="clear">✖</button>
+                    <button onclick="checkPassword()" class="submit">✔</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-letter" class="screen">
+        <div class="hearts" id="hearts"></div>
+        <div class="envelope" id="envelope" onclick="openLetter()">
+            <div class="envelope-flap"></div>
+            <div class="letter">
+                <h1>Chúc mừng sinh nhật chị MIMI nhá</h1>
+                <p>Chúc cho chị tuổi mới sẽ có nhiều điều hạnh phúc mãi mãi xinh đẹp</p>
+                <p>Và cũng phải thật thành công nè, không bao h từ bỏ</p>
+                <p>Luôn vui tươi, vì luôn có mọi người bên cạnh chị hehe.</p>
+                <p>Mặc dù em với chị chỉ mới biết nhau có 1 tháng thoi nhưng mà thật lòng em quý chị!!!</p>
+                <p>Ôi đi chúc sinh nhật mà cứ như là tỏ tình 🤣🤣🤣, coi như là em luôn yêu thương yêu quý chị 👀</p>
+                <p class="signature"><br>Zone</p>
+            </div>
+        </div>
+        <button id="nextButton" onclick="goToParty()">Đi tiếp 👉</button>
+    </div>
+
+    <div id="screen-party" class="screen">
+        <canvas id="fireworks"></canvas>
+        <div class="banner-content">
+            <button id="giftBtn" onclick="openGift()">🎁 MỞ QUÀ NGAY</button>
+            <div id="hbdText" class="hidden-el">🎉 Happy Birthday 🦦 🎉</div>
+            
+            <div class="slider hidden-el">
+                <div class="item"><img src="images/Image 1.jpg" alt="Image 1" onerror="this.src='https://via.placeholder.com/200x250/FF6B9D/FFFFFF?text=Photo+1'"></div>
+                <div class="item"><img src="images/Image 2.jpg" alt="Image 2" onerror="this.src='https://via.placeholder.com/200x250/C44569/FFFFFF?text=Photo+2'"></div>
+                <div class="item"><img src="images/Image 3.jpg" alt="Image 3" onerror="this.src='https://via.placeholder.com/200x250/F8B500/FFFFFF?text=Photo+3'"></div>
+            </div>
+
+            <img class="cake-img hidden-el" src="images/cake.png" alt="Bánh sinh nhật" onerror="this.style.display='none'">
+        </div>
+    </div>
+
+    <!-- Audio chạy suốt từ đầu đến cuối -->
+    <audio id="birthday-audio" src="hpbd.mp3" preload="auto" loop></audio>
+
+    <script>
+        // --- LOGIC CHUNG ---
+        const PASSWORD = "0302"; // ĐỔI MẬT KHẨU Ở ĐÂY
+        let currentInput = "";
+        let fireworksStarted = false; // Prevent multiple fireworks instances
+        let isTransitioning = false; // Prevent multiple transitions
+        let audioStarted = false; // Track if audio has been started
+
+        // 1. Logic Màn hình Login
+        function addNumber(num) {
+            // Bắt đầu nhạc khi người dùng tương tác lần đầu
+            if (!audioStarted) {
+                startBackgroundMusic();
+            }
+            
+            if (currentInput.length < 6) {
+                currentInput += num;
+                updateDisplay();
+            }
+        }
+
+        function clearPassword() {
+            currentInput = "";
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const display = document.getElementById("password-input");
+            if (display) {
+                display.value = "*".repeat(currentInput.length);
+            }
+        }
+
+        function checkPassword() {
+            if (isTransitioning) return;
+            
+            if (currentInput === PASSWORD) {
+                switchScreen('screen-login', 'screen-letter');
+            } else {
+                alert("Sai mật khẩu rồi người đẹp ơi!");
+                clearPassword();
+            }
+        }
+
+        // Hàm bật nhạc nền
+        function startBackgroundMusic() {
+            const audio = document.getElementById('birthday-audio');
+            if (audio && !audioStarted) {
+                audio.play().catch(e => {
+                    console.log("Audio autoplay blocked, waiting for user interaction:", e);
+                });
+                audioStarted = true;
+            }
+        }
+
+        // Hàm chuyển màn hình - FIXED
+        function switchScreen(hideId, showId) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+            
+            const hideScreen = document.getElementById(hideId);
+            const showScreen = document.getElementById(showId);
+            
+            if (!hideScreen || !showScreen) {
+                console.error('Screen elements not found');
+                isTransitioning = false;
+                return;
+            }
+            
+            hideScreen.classList.remove('active');
+            
+            setTimeout(() => {
+                showScreen.classList.add('active');
+                
+                if (showId === 'screen-letter') {
+                    createHearts();
+                }
+                
+                isTransitioning = false;
+            }, 500);
+        }
+
+        // Create floating hearts for letter screen
+        function createHearts() {
+            const heartsContainer = document.getElementById('hearts');
+            if (!heartsContainer) return;
+            
+            heartsContainer.innerHTML = ''; // Clear previous hearts
+            
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart';
+                    heart.style.left = Math.random() * 100 + '%';
+                    heart.style.bottom = '-20px';
+                    heart.innerHTML = '❤️';
+                    heart.style.fontSize = (Math.random() * 10 + 15) + 'px';
+                    heartsContainer.appendChild(heart);
+                    
+                    // Remove heart after animation
+                    setTimeout(() => {
+                        if (heart.parentNode) {
+                            heart.remove();
+                        }
+                    }, 3000);
+                }, i * 200);
+            }
+        }
+
+        // 2. Logic Màn hình Thư
+        function openLetter() {
+            const envelope = document.getElementById('envelope');
+            if (!envelope) return;
+            
+            // Bắt đầu nhạc khi click vào phong bì
+            if (!audioStarted) {
+                startBackgroundMusic();
+            }
+            
+            if (!envelope.classList.contains('open')) {
+                envelope.classList.add('open');
+                // Hiện nút đi tiếp sau khi thư mở
+                setTimeout(() => {
+                    const nextBtn = document.getElementById('nextButton');
+                    if (nextBtn) {
+                        nextBtn.style.opacity = '1';
+                        nextBtn.style.pointerEvents = 'auto';
+                    }
+                }, 1000);
+            }
+        }
+
+        function goToParty() {
+            if (isTransitioning) return;
+            
+            // Reset party screen state before transitioning
+            const giftBtn = document.getElementById('giftBtn');
+            const hbdText = document.getElementById('hbdText');
+            const slider = document.querySelector('.slider');
+            const cake = document.querySelector('.cake-img');
+            
+            if (giftBtn) giftBtn.style.display = 'block';
+            if (hbdText) {
+                hbdText.classList.add('hidden-el');
+                hbdText.style.opacity = '0';
+            }
+            if (slider) slider.style.display = 'none';
+            if (cake) cake.style.display = 'none';
+            
+            switchScreen('screen-letter', 'screen-party');
+        }
+
+        // 3. Logic Màn hình Tiệc (Banh.html)
+        function openGift() {
+            const btn = document.getElementById('giftBtn');
+            const hbdText = document.getElementById('hbdText');
+            const slider = document.querySelector('.slider');
+            const cake = document.querySelector('.cake-img');
+
+            if (btn) btn.style.display = 'none'; // Ẩn nút quà
+            
+            // Hiện các phần tử
+            if (hbdText) {
+                hbdText.classList.remove('hidden-el');
+                hbdText.style.opacity = '1';
+            }
+            
+            setTimeout(() => {
+                if (slider) {
+                    slider.classList.remove('hidden-el');
+                    slider.style.display = 'flex'; // Dùng flex để hiển thị 3 ảnh ngang
+                }
+                if (cake) {
+                    cake.classList.remove('hidden-el');
+                    cake.style.display = 'block';
+                }
+            }, 500);
+            
+            // Bắt đầu pháo hoa (chỉ 1 lần)
+            if (!fireworksStarted) {
+                startFireworks();
+                fireworksStarted = true;
+            }
+        }
+
+        // --- LOGIC PHÁO HOA (GIẢ LẬP ĐƠN GIẢN) ---
+        function startFireworks() {
+            const canvas = document.getElementById('fireworks');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            let animationFrameId = null;
+            
+            function createParticle(x, y) {
+                const particleCount = 30;
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push({
+                        x: x,
+                        y: y,
+                        color: `hsl(${Math.random() * 360}, 50%, 50%)`,
+                        radius: Math.random() * 3,
+                        velocity: {
+                            x: (Math.random() - 0.5) * 6,
+                            y: (Math.random() - 0.5) * 6 - 2 // Slight upward bias
+                        },
+                        alpha: 1
+                    });
+                }
+            }
+
+            function animate() {
+                animationFrameId = requestAnimationFrame(animate);
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; // Tạo vệt mờ
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                for (let index = particles.length - 1; index >= 0; index--) {
+                    const p = particles[index];
+                    if (p.alpha > 0) {
+                        p.x += p.velocity.x;
+                        p.y += p.velocity.y;
+                        p.velocity.y += 0.1; // gravity
+                        p.alpha -= 0.01;
+                        
+                        ctx.save();
+                        ctx.globalAlpha = p.alpha;
+                        ctx.fillStyle = p.color;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                    } else {
+                        particles.splice(index, 1);
+                    }
+                }
+
+                // Tự động bắn pháo hoa ngẫu nhiên
+                if (Math.random() < 0.05) {
+                    createParticle(Math.random() * canvas.width, Math.random() * canvas.height / 2);
+                }
+            }
+            animate();
+            
+            // Resize canvas khi đổi kích thước màn hình
+            const resizeHandler = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+            window.addEventListener('resize', resizeHandler);
+        }
+        
+        // Khởi tạo khi trang load
+        window.addEventListener('DOMContentLoaded', () => {
+            updateDisplay();
+            
+            // Thử bật nhạc ngay khi load (một số trình duyệt cho phép)
+            const audio = document.getElementById('birthday-audio');
+            if (audio) {
+                audio.play().catch(() => {
+                    // Nếu bị chặn autoplay, đợi tương tác đầu tiên
+                    console.log("Autoplay blocked. Music will start on first interaction.");
+                });
+            }
+        });
+    </script>
+</body>
+</html>
